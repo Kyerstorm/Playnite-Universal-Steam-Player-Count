@@ -4,8 +4,8 @@
     <sys:String x:Key="LOCSteamPlayerCountName">Steam Player Count</sys:String>
     <sys:String x:Key="LOCSteamPlayerCountTopPanelTitle">{0} playing on Steam: {1}</sys:String>
     <sys:String x:Key="LOCSteamPlayerCountSettingEnableNonSteamMatching">Show Steam player counts for games from other libraries (GOG, Epic and so on)</sys:String>
-    <sys:String x:Key="LOCSteamPlayerCountSettingShowTopPanelItem">Show the player count in the top panel</sys:String>
-    <sys:String x:Key="LOCSteamPlayerCountSettingEnableThemeControl">Show the player count in themes that support it</sys:String>
+    <sys:String x:Key="LOCSteamPlayerCountSettingShowTopPanelItem">Also show the player count in the top panel (use this if your theme does not support the extension)</sys:String>
+    <sys:String x:Key="LOCSteamPlayerCountSettingEnableThemeControl">Show the player count inside the theme (the theme must support the extension)</sys:String>
     <sys:String x:Key="LOCSteamPlayerCountMenuMatch">Match to Steam game…</sys:String>
     <sys:String x:Key="LOCSteamPlayerCountMenuExclude">Mark as not on Steam</sys:String>
     <sys:String x:Key="LOCSteamPlayerCountMenuReset">Reset Steam match</sys:String>

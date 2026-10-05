@@ -8,7 +8,8 @@ namespace UniversalSteamPlayerCount
     public class PluginSettings : ObservableObject
     {
         private bool enableNonSteamMatching = true;
-        private bool showTopPanelItem = true;
+        // The theme element is the default surface; the top panel item is an opt-in for themes without support.
+        private bool showTopPanelItem = false;
         private bool enableThemeControl = true;
         private bool playerCountAvailable;
 

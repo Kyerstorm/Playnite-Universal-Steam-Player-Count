@@ -9,9 +9,13 @@ It is a successor to the player-count part of darklinkpower's
 
 ## Where the count appears
 
-- **Top panel:** the count for the selected game. Click it to open the game's
-  SteamDB charts. Can be turned off in the extension settings.
-- **Themes:** a theme can place the count anywhere in its game views.
+- **Inside the theme (default):** a theme that supports the extension places
+  the count in its game views. Click it to open the game's SteamDB charts.
+  A theme without support shows nothing; see
+  [docs/theme-integration.md](docs/theme-integration.md) to add it.
+- **Top panel (off by default):** turn on "Also show the player count in the
+  top panel" in the extension settings if your theme does not support the
+  extension. It works on any theme.
 
 ## How a non-Steam game is matched
 
@@ -33,6 +37,8 @@ Right-click a game and open **Steam Player Count** to:
 the whole library in one pass.
 
 ## For theme authors
+
+Full guide, with a worked example: [docs/theme-integration.md](docs/theme-integration.md).
 
 ```xml
 <ContentControl x:Name="SteamPlayerCount_PlayerCountControl" />

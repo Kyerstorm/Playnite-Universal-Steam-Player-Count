@@ -20,6 +20,7 @@ be fixed by hand, and the count is visible on any theme.
 | Topic | Decision |
 |---|---|
 | Display | Theme custom element, plus a top panel item as a theme-independent fallback |
+| Display default (revised 2026-10-06) | The theme element is the default surface. The top panel item is off by default and is an opt-in for themes without support. Theme authors: `docs/theme-integration.md` |
 | Matching | Automatic and strict, with a manual fix |
 | Match timing | On selection, plus an optional bulk pass from the main menu |
 | Architecture | Core library with no Playnite reference, thin plugin project, test project |
@@ -195,12 +196,12 @@ exposed with `AddSettingsSupport`, including a non-persisted
   rate-limit response. It ends with one notification, stable id
   `SteamPlayerCount-bulk-match`, giving matched, not found and failed counts.
 
-**Settings** (all default to on):
+**Settings**:
 
 | Setting | Effect |
 |---|---|
 | `EnableNonSteamMatching` | Steps 3 to 5 of the resolver run for non-Steam games |
-| `ShowTopPanelItem` | The top panel item may become visible |
+| `ShowTopPanelItem` | The top panel item may become visible. Default off (the other two default on) |
 | `EnableThemeControl` | The theme element may become visible |
 
 **Localization**: every user-visible string is in `Localization/en_US.xaml`
