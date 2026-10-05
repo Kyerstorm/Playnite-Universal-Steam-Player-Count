@@ -1,0 +1,9 @@
+<pn:PluginUserControl x:Class="UniversalSteamPlayerCount.PlayerCountControl"
+                      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                      xmlns:pn="clr-namespace:Playnite.SDK.Controls;assembly=Playnite.SDK">
+    <!-- No colors, fonts or sizes here: the hosting theme styles the button. -->
+    <Button Visibility="{Binding ControlVisibility}"
+            Command="{Binding OpenSteamDbCommand}"
+            Content="{Binding PlayerCountText}" />
+</pn:PluginUserControl>

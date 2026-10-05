@@ -20,6 +20,7 @@ namespace UniversalSteamPlayerCount
 
         private readonly Lazy<PluginServices> services;
         private SelectionWatcher watcher;
+        private MatchActions actions;
         private TopPanelItem topPanelItem;
         private TextBlock topPanelText;
         private PlayerCountResult lastResult = PlayerCountResult.None;
@@ -135,6 +136,63 @@ namespace UniversalSteamPlayerCount
             }
 
             yield return topPanelItem;
+        }
+
+        public override Control GetGameViewControl(GetGameViewControlArgs args)
+        {
+            try
+            {
+                if (args.Name == PlayerCountControlName)
+                {
+                    return new PlayerCountControl(PlayniteApi, SettingsViewModel, () => Services.Counts, logger);
+                }
+            }
+            catch (Exception e)
+            {
+                logger.Error(e, "GetGameViewControl failed");
+            }
+
+            return null;
+        }
+
+        // Menus are built once, on first use, and returned as-is every time a menu opens.
+        private MatchActions Actions
+        {
+            get
+            {
+                if (actions == null)
+                {
+                    actions = new MatchActions(PlayniteApi, () => Services, OnMatchesChanged, logger);
+                }
+
+                return actions;
+            }
+        }
+
+        public override IEnumerable<GameMenuItem> GetGameMenuItems(GetGameMenuItemsArgs args)
+        {
+            try
+            {
+                return Actions.GameMenuItems;
+            }
+            catch (Exception e)
+            {
+                logger.Error(e, "GetGameMenuItems failed");
+                return new List<GameMenuItem>();
+            }
+        }
+
+        public override IEnumerable<MainMenuItem> GetMainMenuItems(GetMainMenuItemsArgs args)
+        {
+            try
+            {
+                return Actions.MainMenuItems;
+            }
+            catch (Exception e)
+            {
+                logger.Error(e, "GetMainMenuItems failed");
+                return new List<MainMenuItem>();
+            }
         }
 
         public override ISettings GetSettings(bool firstRunSettings)
