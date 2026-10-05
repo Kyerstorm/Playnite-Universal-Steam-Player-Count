@@ -49,6 +49,7 @@ namespace SteamPlayerCount.Core
         private Timer timer;
         private MatchStore attached;
         private bool pending;
+        private bool timerArmed;
         private bool savingDisabled;
 
         public MatchFile(string directory, IClock clock, Action<Exception, string> logError = null)
@@ -126,6 +127,7 @@ namespace SteamPlayerCount.Core
         {
             lock (sync)
             {
+                timerArmed = false;
                 if (!pending || attached == null)
                 {
                     return;
@@ -199,13 +201,18 @@ namespace SteamPlayerCount.Core
 
         private void OnStoreChanged(object sender, EventArgs e)
         {
+            // Arm the timer once per pending save. Re-arming on every change would let a steady
+            // stream of changes (the bulk pass) postpone the save until the stream ends.
+            bool arm;
             lock (sync)
             {
                 pending = true;
+                arm = !timerArmed;
+                timerArmed = true;
             }
 
             var current = timer;
-            if (current != null)
+            if (arm && current != null)
             {
                 try
                 {

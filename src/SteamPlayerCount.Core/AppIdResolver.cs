@@ -51,6 +51,8 @@ namespace SteamPlayerCount.Core
         private readonly ISteamSearch search;
         private readonly IClock clock;
         private readonly Func<bool> nonSteamMatchingEnabled;
+        private readonly object sync = new object();
+        private readonly Dictionary<Guid, Task<ResolveResult>> inFlight = new Dictionary<Guid, Task<ResolveResult>>();
 
         public AppIdResolver(MatchStore store, ISteamSearch search, IClock clock, Func<bool> nonSteamMatchingEnabled)
         {
@@ -79,7 +81,45 @@ namespace SteamPlayerCount.Core
                 return local;
             }
 
-            var outcome = await search.SearchAsync(game.Name, ct).ConfigureAwait(false);
+            // One search per game at a time: the top panel and a theme element ask for the same game together.
+            // The caller's token stops the caller waiting; the search itself finishes and stores its result.
+            ct.ThrowIfCancellationRequested();
+            return await PlayerCountService.WaitWithCancellation(GetOrStartSearch(game), ct).ConfigureAwait(false);
+        }
+
+        private Task<ResolveResult> GetOrStartSearch(GameInfo game)
+        {
+            lock (sync)
+            {
+                Task<ResolveResult> running;
+                if (!inFlight.TryGetValue(game.Id, out running))
+                {
+                    running = Task.Run(() => SearchAndStoreAsync(game));
+                    inFlight[game.Id] = running;
+                }
+
+                return running;
+            }
+        }
+
+        private async Task<ResolveResult> SearchAndStoreAsync(GameInfo game)
+        {
+            try
+            {
+                return await SearchAndStoreCoreAsync(game).ConfigureAwait(false);
+            }
+            finally
+            {
+                lock (sync)
+                {
+                    inFlight.Remove(game.Id);
+                }
+            }
+        }
+
+        private async Task<ResolveResult> SearchAndStoreCoreAsync(GameInfo game)
+        {
+            var outcome = await search.SearchAsync(game.Name, CancellationToken.None).ConfigureAwait(false);
             if (outcome.Status == SearchStatus.RateLimited)
             {
                 return ResolveResult.RateLimited;

@@ -157,8 +157,11 @@ temporary file that then replaces the real one. A pending save is flushed in
 When exactly one game is selected it cancels the previous request, asks
 `PlayerCountService`, and publishes the result on the UI dispatcher. The result
 is ignored if the selection changed while the request was running. Cancelling
-stops a name search and stops the caller waiting; a count fetch already under way
-is shared, runs to completion (at most the 10 s timeout) and fills the cache.
+stops the caller waiting. A name search or count fetch already under way is
+shared between callers, runs to completion (bounded by the 10 s timeout and one
+retry) and stores or caches its result. Revised 2026-10-06 after code review:
+name searches are shared per game so the top panel and a theme element never
+send the same search twice.
 
 **`PlayerCountControl : PluginUserControl`**: theme element. A `Button` whose
 content is the formatted count, collapsed when there is no count. It gets its

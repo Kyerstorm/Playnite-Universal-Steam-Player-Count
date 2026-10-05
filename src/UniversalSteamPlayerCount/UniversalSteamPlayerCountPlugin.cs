@@ -19,6 +19,7 @@ namespace UniversalSteamPlayerCount
         private static readonly ILogger logger = LogManager.GetLogger();
 
         private readonly Lazy<PluginServices> services;
+        private readonly List<WeakReference<PlayerCountControl>> themeControls = new List<WeakReference<PlayerCountControl>>();
         private SelectionWatcher watcher;
         private MatchActions actions;
         private TopPanelItem topPanelItem;
@@ -144,7 +145,10 @@ namespace UniversalSteamPlayerCount
             {
                 if (args.Name == PlayerCountControlName)
                 {
-                    return new PlayerCountControl(PlayniteApi, SettingsViewModel, () => Services.Counts, logger);
+                    var control = new PlayerCountControl(PlayniteApi, SettingsViewModel, () => Services.Counts, logger);
+                    // Weak, so a control Playnite has dropped can be collected.
+                    themeControls.Add(new WeakReference<PlayerCountControl>(control));
+                    return control;
                 }
             }
             catch (Exception e)
@@ -208,17 +212,33 @@ namespace UniversalSteamPlayerCount
         // Called after a match was set, cleared or excluded by the user.
         public void OnMatchesChanged()
         {
-            if (watcher != null)
-            {
-                watcher.Refresh();
-            }
+            RefreshAll();
         }
 
         public void OnSettingsSaved()
         {
+            RefreshAll();
+        }
+
+        // The top panel item and every live theme element show the same data, so both re-query.
+        private void RefreshAll()
+        {
             if (watcher != null)
             {
                 watcher.Refresh();
+            }
+
+            foreach (var weak in themeControls.ToArray())
+            {
+                PlayerCountControl control;
+                if (weak.TryGetTarget(out control))
+                {
+                    control.Refresh();
+                }
+                else
+                {
+                    themeControls.Remove(weak);
+                }
             }
         }
 

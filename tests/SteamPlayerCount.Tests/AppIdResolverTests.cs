@@ -214,6 +214,25 @@ namespace SteamPlayerCount.Tests
             Assert.False(resolver.NeedsSearch(null));
         }
 
+        [Fact]
+        public async Task Concurrent_resolves_of_the_same_game_share_one_search()
+        {
+            var game = Games.Gog("Prey");
+            var gate = new TaskCompletionSource<bool>();
+            search.Gate = gate.Task;
+            SearchReturns(new SteamCandidate(480490, "Prey", "app"));
+            var resolver = Resolver();
+
+            var first = resolver.ResolveAsync(game, CancellationToken.None);
+            var second = resolver.ResolveAsync(game, CancellationToken.None);
+            gate.SetResult(true);
+            var results = await Task.WhenAll(first, second);
+
+            Assert.Equal(480490, results[0].AppId);
+            Assert.Equal(480490, results[1].AppId);
+            Assert.Equal(1, search.Calls);
+        }
+
         // Review Focus 1
         [Theory]
         [InlineData(null)]

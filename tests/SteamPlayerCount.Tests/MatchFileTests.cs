@@ -143,6 +143,23 @@ namespace SteamPlayerCount.Tests
             Assert.Single(File_().Load().Snapshot());
         }
 
+        [Fact]
+        public void Steady_changes_do_not_keep_postponing_the_save()
+        {
+            var file = File_();
+            var store = file.Load();
+            file.Attach(store);
+
+            // Two changes 1.3 s apart, as the bulk pass makes them. The save is due 2 s after the first.
+            store.Set(Guid.NewGuid(), new MatchEntry { AppId = 1, Source = MatchSource.Manual, CheckedUtc = clock.UtcNow });
+            System.Threading.Thread.Sleep(1300);
+            store.Set(Guid.NewGuid(), new MatchEntry { AppId = 2, Source = MatchSource.Manual, CheckedUtc = clock.UtcNow });
+            System.Threading.Thread.Sleep(1300);
+
+            Assert.True(File.Exists(FilePath));
+            file.Dispose();
+        }
+
         // Review Focus 5
         [Fact]
         public void A_save_that_cannot_write_reports_failure_logs_and_is_retried_by_the_next_flush()

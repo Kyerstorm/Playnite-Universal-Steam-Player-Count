@@ -22,13 +22,16 @@ namespace SteamPlayerCount.Tests
         public Func<string, SearchOutcome> Handler = term => SearchOutcome.Success(new SteamCandidate[0]);
         public Action BeforeReturn;
 
-        public Task<SearchOutcome> SearchAsync(string term, CancellationToken ct)
+        public Task Gate = Task.CompletedTask;
+
+        public async Task<SearchOutcome> SearchAsync(string term, CancellationToken ct)
         {
-            Calls++;
+            Interlocked.Increment(ref Calls);
             ct.ThrowIfCancellationRequested();
+            await Gate.ConfigureAwait(false);
             var outcome = Handler(term);
             BeforeReturn?.Invoke();
-            return Task.FromResult(outcome);
+            return outcome;
         }
     }
 

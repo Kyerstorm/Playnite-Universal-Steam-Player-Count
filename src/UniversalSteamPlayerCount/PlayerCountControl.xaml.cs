@@ -94,6 +94,18 @@ namespace UniversalSteamPlayerCount
             }
         }
 
+        // Re-runs the request for the current game, for example after a manual match or a settings change.
+        public void Refresh()
+        {
+            if (!Dispatcher.CheckAccess())
+            {
+                Dispatcher.BeginInvoke(new Action(Refresh));
+                return;
+            }
+
+            GameContextChanged(GameContext, GameContext);
+        }
+
         private async void OnTick(object sender, EventArgs e)
         {
             timer.Stop();

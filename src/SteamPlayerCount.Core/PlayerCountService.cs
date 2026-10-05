@@ -97,7 +97,7 @@ namespace SteamPlayerCount.Core
             }
         }
 
-        private static async Task<T> WaitWithCancellation<T>(Task<T> task, CancellationToken ct)
+        internal static async Task<T> WaitWithCancellation<T>(Task<T> task, CancellationToken ct)
         {
             if (!task.IsCompleted && ct.CanBeCanceled)
             {
