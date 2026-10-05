@@ -1,0 +1,18 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+    <sys:String x:Key="LOCSteamPlayerCountName">Steam Player Count</sys:String>
+    <sys:String x:Key="LOCSteamPlayerCountTopPanelTitle">{0} playing on Steam: {1}</sys:String>
+    <sys:String x:Key="LOCSteamPlayerCountSettingEnableNonSteamMatching">Show Steam player counts for games from other libraries (GOG, Epic and so on)</sys:String>
+    <sys:String x:Key="LOCSteamPlayerCountSettingShowTopPanelItem">Show the player count in the top panel</sys:String>
+    <sys:String x:Key="LOCSteamPlayerCountSettingEnableThemeControl">Show the player count in themes that support it</sys:String>
+    <sys:String x:Key="LOCSteamPlayerCountMenuMatch">Match to Steam game…</sys:String>
+    <sys:String x:Key="LOCSteamPlayerCountMenuExclude">Mark as not on Steam</sys:String>
+    <sys:String x:Key="LOCSteamPlayerCountMenuReset">Reset Steam match</sys:String>
+    <sys:String x:Key="LOCSteamPlayerCountMenuBulk">Match unmatched games</sys:String>
+    <sys:String x:Key="LOCSteamPlayerCountMatchDialogCaption">Choose the Steam game for {0}</sys:String>
+    <sys:String x:Key="LOCSteamPlayerCountBulkProgress">Matching games to Steam…</sys:String>
+    <sys:String x:Key="LOCSteamPlayerCountBulkResult">Steam matching finished: {0} matched, {1} not found, {2} failed.</sys:String>
+    <sys:String x:Key="LOCSteamPlayerCountBulkRateLimited">Steam matching stopped because Steam asked for fewer requests. {0} matched, {1} not found, {2} failed. Run it again later.</sys:String>
+    <sys:String x:Key="LOCSteamPlayerCountBulkNothing">There are no unmatched games.</sys:String>
+</ResourceDictionary>

@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <UseWPF>true</UseWPF>
+    <AssemblyName>UniversalSteamPlayerCount</AssemblyName>
+    <RootNamespace>UniversalSteamPlayerCount</RootNamespace>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+    <Version>1.0.0</Version>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- Playnite provides Playnite.SDK.dll at runtime; do not ship a copy. -->
+    <PackageReference Include="PlayniteSDK" Version="6.17.0" ExcludeAssets="runtime" />
+    <ProjectReference Include="..\SteamPlayerCount.Core\SteamPlayerCount.Core.csproj" />
+    <!-- SteamHttp's constructor exposes HttpMessageHandler. -->
+    <Reference Include="System.Net.Http" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Playnite loads localization files from disk; they must not be compiled into the assembly. -->
+    <Page Remove="Localization\**\*.xaml" />
+    <None Include="Localization\**\*.xaml" CopyToOutputDirectory="PreserveNewest" />
+    <None Update="extension.yaml" CopyToOutputDirectory="PreserveNewest" />
+    <None Update="icon.png" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>
