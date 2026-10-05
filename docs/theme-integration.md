@@ -99,9 +99,34 @@ The element behaves the same way (a button that shows the number and opens
 SteamDB), so no layout change is needed. The difference users see is that games
 from GOG, Epic and other libraries now get a count too.
 
-A theme can support both extensions by keeping both blocks. Each hides itself
-when its own extension has no count, but a user with both installed would see
-the number twice for Steam games.
+Renaming alone drops the count for anyone who has News Viewer but not this
+extension. To keep them covered, support both: see the next section.
+
+## Supporting both extensions (backwards compatible)
+
+Keep the News Viewer block, add this extension's block next to it, and make the
+News Viewer block step aside when this extension is in charge. No change to
+either extension is needed; the theme decides with one extra trigger condition.
+
+The condition reads this extension's `EnableThemeControl` setting with
+`FallbackValue=False`. It is `False` when the extension is not installed and
+when the user has unticked "Show the player count inside the theme". In both
+cases News Viewer's count should show, so that setting doubles as the user's
+toggle between the two.
+
+| News Viewer | This extension | "Show inside the theme" | Count shown by |
+|---|---|---|---|
+| installed | not installed | n/a | News Viewer |
+| not installed | installed | on | this extension |
+| installed | installed | on | this extension |
+| installed | installed | off | News Viewer |
+| not installed | not installed | n/a | nothing |
+
+News Viewer's News tab is a separate element and is unaffected in every row.
+
+With both installed, News Viewer still requests its own count in the background
+even though the theme hides it. A user who wants to avoid that can untick the
+players option in News Viewer's settings; its News tab keeps working.
 
 ## Worked example: Laylu
 
@@ -113,9 +138,33 @@ markup:
   `Players online right now (News Viewer)`
 - `theme/Views/GridViewGameOverview.xaml`, the same block
 
-Replace that block, in both files, with:
+Keep that block and change its trigger so it steps aside when this extension
+is in charge, then add this extension's block directly after it. In both files,
+the players entry becomes:
 
 ```xml
+<!-- Players online right now (News Viewer). Hidden when Universal Steam Player Count is in charge. -->
+<StackPanel Margin="14,0,14,0">
+    <StackPanel.Style>
+        <Style TargetType="StackPanel">
+            <Setter Property="Visibility" Value="Collapsed" />
+            <Style.Triggers>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{PluginSettings Plugin=NewsViewer, Path=PlayersCountAvailable, FallbackValue=False}" Value="True" />
+                        <!-- False when the other extension is missing or its theme element is turned off -->
+                        <Condition Binding="{PluginSettings Plugin=SteamPlayerCount, Path=EnableThemeControl, FallbackValue=False}" Value="False" />
+                    </MultiDataTrigger.Conditions>
+                    <Setter Property="Visibility" Value="Visible" />
+                </MultiDataTrigger>
+            </Style.Triggers>
+        </Style>
+    </StackPanel.Style>
+    <ContentControl x:Name="NewsViewer_PlayersInGameViewerControl" Focusable="False"
+                    HorizontalAlignment="Center"
+                    FontSize="{DynamicResource FontSizeLarger}" />
+    <TextBlock Text="Playing Now" Style="{StaticResource LayluStatCaption}" />
+</StackPanel>
 <!-- Players online right now (Universal Steam Player Count); the extension draws the number -->
 <StackPanel Margin="14,0,14,0">
     <StackPanel.Style>
@@ -135,17 +184,25 @@ Replace that block, in both files, with:
 </StackPanel>
 ```
 
-Only three things differ from the existing block: the comment, the
-`PluginSettings` source and path, and the `x:Name`. `LayluStatCaption` and
-`FontSizeLarger` are Laylu's own resources and stay as they are.
+In the first block only the trigger changed: the single `DataTrigger` became a
+`MultiDataTrigger` with one added condition. The second block is new.
+`LayluStatCaption` and `FontSizeLarger` are Laylu's own resources. Laylu already
+uses this `MultiDataTrigger` shape with `PluginSettings` conditions for its
+trailer panel.
 
-Then restart Playnite (themes load at startup) and check:
+Then restart Playnite (themes load at startup) and check each setup:
 
-1. A Steam game shows a number above "Playing Now" in the stat row.
-2. A GOG or Epic game that is also on Steam shows one too.
-3. A game that is not on Steam shows no "Playing Now" entry and leaves no gap.
-4. The same holds in the Grid view side panel.
-5. With the extension disabled, the stat row has no "Playing Now" entry and
+1. **Only News Viewer installed:** a Steam game shows one "Playing Now" entry,
+   as before this change.
+2. **Only this extension installed:** a Steam game shows one entry; a GOG or
+   Epic game that is also on Steam shows one too.
+3. **Both installed:** exactly one entry, never two. A GOG or Epic game gets a
+   count, which shows it comes from this extension.
+4. **Both installed, "Show the player count inside the theme" unticked here:**
+   still one entry for Steam games, now from News Viewer.
+5. A game that is not on Steam shows no entry and leaves no gap.
+6. The same holds in the Grid view side panel.
+7. With both extensions disabled, the stat row has no "Playing Now" entry and
    `playnite.log` has no XAML error.
 
 ## Things to know
