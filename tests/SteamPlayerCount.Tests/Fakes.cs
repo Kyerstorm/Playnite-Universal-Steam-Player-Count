@@ -46,4 +46,18 @@ namespace SteamPlayerCount.Tests
             return new GameInfo(Guid.NewGuid(), name, GogPluginId, "gog-1", links);
         }
     }
+
+    internal sealed class FakeCounts : ISteamPlayerCounts
+    {
+        public int Calls;
+        public Func<int, CountOutcome> Handler = appId => CountOutcome.Success(100);
+        public Task Gate = Task.CompletedTask;
+
+        public async Task<CountOutcome> GetAsync(int appId, CancellationToken ct)
+        {
+            Interlocked.Increment(ref Calls);
+            await Gate.ConfigureAwait(false);
+            return Handler(appId);
+        }
+    }
 }
