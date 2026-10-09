@@ -1,5 +1,8 @@
 # Universal Steam Player Count
 
+> [!NOTE]
+> **AI disclaimer:** I am not completely confident in this specific extension. I have reviewed everything to my knowledge us fine and i will refine this more as i find or get reported issues. You can treat this as humanely reviewed 
+
 A Playnite extension that shows how many people are playing the selected game on
 Steam right now. It works for Steam games and for games from other libraries
 (GOG, Epic and so on) that also exist on Steam.
